@@ -4,7 +4,6 @@ using Distributions: cdf, Normal
 
 export C
 
-
 """
 :param S: stock price
 :param L: strike price

@@ -40,13 +40,13 @@ function k(df::DataFrame)
         [:vol, :open, :high, :low, :close, :time],
         0)
 
-    for k ∈ ks
-        vol::Int64 = sum(k[:vol])
-        open::Float64 = k[1, :price]
-        high::Float64 = max(k[:price])
-        low::Float64 = min(k[:price])
-        close::Float64 = k[end, :price]
-        time::String = k[1, :time]
+    for _k ∈ ks
+        vol::Int64 = sum(_k[:vol])
+        open::Float64 = _k[1, :price]
+        high::Float64 = maximum(_k[:price])
+        low::Float64 = minimum(_k[:price])
+        close::Float64 = _k[end, :price]
+        time::String = _k[1, :time]
 
         push!(k_df, [vol, open, high, low, close, time])
     end

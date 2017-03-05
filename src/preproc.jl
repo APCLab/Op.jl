@@ -10,7 +10,8 @@ using DataFrames
     ]
 """
 function fetch(keys::Array)
-    base_url = "http://localhost:5984"
+    server = get(ENV, "COUCH_SERVER", "localhost")
+    base_url = "http://$server:5984"
     view = "/market/_design/options/_view/txo?reduce=false&limit=5"
     headers = Dict("Content-Type" => "application/json")
     body = JSON.json(Dict("keys" => keys))
@@ -33,6 +34,7 @@ function extract(rows::Array)
 end
 
 
+"Generate k bar"
 function k(df::DataFrame)
     ks = groupby(df, :time)
     k_df = DataFrame(
@@ -53,3 +55,38 @@ function k(df::DataFrame)
 
     k_df
 end
+
+
+"""
+History Volatility
+
+Calculate σ like a boss
+
+:param k_df: a vertor of k bars
+:param type: (history|implied)
+:param T: the total days of ``k_df``
+"""
+function σ_his()
+    server = get(ENV, "COUCH_SERVER", "localhost")
+    url = "http://$server:5984/twse/_design/twii-daily/_view/close"
+    headers = Dict("Content-Type" => "application/json")
+    res = HTTP.get(url, headers = headers)
+    rows = JSON.parse(string(res))["rows"]
+
+    df = DataFrame([String, Float64, Float64], [:date, :close, :ret], 0)
+    [push!(df, [r["key"], r["value"], NaN]) for r ∈ rows]
+
+    returns = [(df[i, :close] - df[i - 1, :close]) /  df[i - 1, :close]
+               for i ∈ 2:length(df[:close])]
+    prepend!(returns, [NaN])
+
+    df[:ret] = returns
+    df[:year_σ] = σ_interval(252, returns)
+    df[:mon_σ] = σ_interval(20, returns)
+    df
+end
+
+
+σ_interval(i::Int64, returns::Array) = [
+    ((idx < i + 1) ? NaN : std(returns[idx - i:idx]))
+    for idx ∈ 1:length(returns)] * 100 * √252

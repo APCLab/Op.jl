@@ -90,3 +90,11 @@ end
 σ_interval(i::Int64, returns::Array) = [
     ((idx < i + 1) ? NaN : std(returns[idx - i:idx]))
     for idx ∈ 1:length(returns)] * 100 * √252
+
+
+"round to nearest strike price"
+function strike_price(x)::Float64
+    y = div(x, 100) * 100.0
+    z = y + 100
+    (abs(y - x) < abs(z - x)) ? y : z
+end

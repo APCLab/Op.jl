@@ -1,13 +1,9 @@
-#=
-This script shows how a simple MLP net may be used
-for regression. It shows how data in memory may be
-used for training and evaluation, and how to obtain
-the predictions from the trained net.
-=#
 using MXNet
 using Distributions
-using PyPlot
+using Plots
 using DataFrames
+
+pyplot()
 
 # data generating process
 cc = readtable("./ccc.csv")

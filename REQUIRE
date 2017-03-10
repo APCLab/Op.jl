@@ -3,3 +3,5 @@ Distributions
 HTTP
 JSON
 DataFrames
+Plots
+PyPlot

@@ -21,6 +21,14 @@ function load(col::Array{Symbol})
     global target_test = target[:, target_idx+1:end]
 end
 
+function plot_bs()
+    load()
+    scatter(Array(c[:close]), Array(c[:BS]),
+            xlim=(0, 600), ylim=(0, 600),
+            xlabel="real price", ylabel="pred price")
+    savefig("bs.png")
+end
+
 function input_1()
     load([:price, :contract, :mon_σ, :T])
 

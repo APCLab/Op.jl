@@ -7,8 +7,8 @@ pyplot()
 
 # data generating process
 function load(col::Array{Symbol})
-    global cc = readtable("./ccc.csv")
-    cc[:mon_σ] *= 1000
+    global cc = readtable("./ccc_macd.csv")
+    cc[:mon_σ] *= 100
 
     global data = convert(Array{Float64}, cc[col])'
     global data_idx = Int(round(size(data)[2] * 0.80))
@@ -37,39 +37,49 @@ function input_1()
     # WTF: if we enable ``suffle``, the optimizer will fail to converge
     trainprovider = mx.ArrayDataProvider(
         :data => data_train,
+        :label => target_train,
         batch_size = batchsize,
-        :label => target_train)
+        shuffle = true,
+        )
 
     evalprovider = mx.ArrayDataProvider(
         :data => data_test,
+        :label => target_test,
         batch_size = batchsize,
-        :label => target_test)
+        shuffle = false,
+        )
 
     plotprovider = mx.ArrayDataProvider(
         :data => data_test,
-        :label => target_test)
+        :label => target_test
+        )
 
     trainprovider, evalprovider, plotprovider
 end
 
 function input_2()  # with TA: MACD
-    load([:price, :contract, :mon_σ, :T])
+    load([:price, :contract, :mon_σ, :T, :macd])
 
     batchsize = 64
 
     trainprovider = mx.ArrayDataProvider(
         :data => data_train,
-        batch_size = batchsize,
-        :label => target_train)
+        :label => target_train,
+        batch_size = batchsize
+        shuffle = true,
+        )
 
     evalprovider = mx.ArrayDataProvider(
         :data => data_test,
-        batch_size = batchsize,
-        :label => target_test)
+        :label => target_test,
+        batch_size = batchsize
+        shuffle = false,
+        )
 
     plotprovider = mx.ArrayDataProvider(
         :data => data_test,
-        :label => target_test)
+        :label => target_test
+        )
 
     trainprovider, evalprovider, plotprovider
 end
@@ -98,8 +108,12 @@ net =
               mx.Activation(act_type = :relu) =>
               mx.FullyConnected(num_hidden = 8)  =>
               mx.Activation(act_type = :relu) =>
+              mx.FullyConnected(num_hidden = 4)  =>
+              mx.Activation(act_type = :relu) =>
+              mx.FullyConnected(num_hidden = 2)  =>
+              mx.Activation(act_type = :relu) =>
               mx.FullyConnected(num_hidden = 1)  =>
-              mx.MAERegressionOutput(label)
+              mx.LinearRegressionOutput(label)
 
 # net for quick test
 net_qtest =
@@ -121,7 +135,7 @@ model = mx.FeedForward(net, context=gpu)
 optimizer = mx.ADAM()
 
 # train, reporting loss for training and evaluation sets
-epoch = 50
+epoch = 100
 # initial training with small batch size, to get to a good neighborhood
 mx.fit(
     model, optimizer, initializer = mx.NormalInitializer(0.0,0.1),

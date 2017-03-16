@@ -65,14 +65,14 @@ function input_2()  # with TA: MACD
     trainprovider = mx.ArrayDataProvider(
         :data => data_train,
         :label => target_train,
-        batch_size = batchsize
+        batch_size = batchsize,
         shuffle = true,
         )
 
     evalprovider = mx.ArrayDataProvider(
         :data => data_test,
         :label => target_test,
-        batch_size = batchsize
+        batch_size = batchsize,
         shuffle = false,
         )
 

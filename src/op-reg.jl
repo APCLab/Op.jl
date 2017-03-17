@@ -31,8 +31,13 @@ end
 
 function input(model::Symbol)
     cols = if model == :orig
+        global plot_title = "P, P_s, σ_month, T"
+
         [:price, :contract, :mon_σ, :T]
+
     elseif model == :ta  # with TA: MACD
+        global plot_title = "P, P_s, σ_month, T, MACD"
+
         [:price, :contract, :mon_σ, :T, :macd]
     end
 

@@ -131,20 +131,26 @@ optimizer = mx.ADAM()
 epoch = 100
 # initial training with small batch size, to get to a good neighborhood
 mx.fit(
-    model, optimizer, initializer = mx.NormalInitializer(0.0,0.1),
-    eval_metric = mx.NMSE(), trainprovider, eval_data = evalprovider,
+    model, optimizer,
+    initializer = mx.NormalInitializer(0.0,0.1),
+    eval_metric = mx.NMSE(),
+    trainprovider,
+    eval_data = evalprovider,
     n_epoch = epoch)
 # more training with the full sample
 mx.fit(
-    model, optimizer, eval_metric = mx.NMSE(),
-    trainprovider, eval_data = evalprovider, n_epoch = epoch)
+    model, optimizer,
+    eval_metric = mx.NMSE(),
+    trainprovider,
+    eval_data = evalprovider,
+    n_epoch = epoch)
 
 fit = mx.predict(model, plotprovider)
 
 function plot_pred(target_test, fit)
     scatter(target_test', fit',
             xlim = (0, 600), ylim = (0, 600),
-            xlabel = "real price", ylabel = "pred price"
+            xlabel = "real price", ylabel = "pred price",
             title = plot_title)
     savefig("out.png")
     write("net.dot", mx.to_graphviz(net))

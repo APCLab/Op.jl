@@ -140,11 +140,18 @@ mx.fit(
     trainprovider, eval_data = evalprovider, n_epoch = epoch)
 
 fit = mx.predict(model, plotprovider)
-scatter(target_test', fit')
-#= xlabel("real price") =#
-#= ylabel("predicted price") =#
-#= title("outputs: true versus predicted. 45º line is what we hope for") =#
-savefig("out.png")
+
+function plot_pred(target_test, fit)
+    scatter(target_test', fit',
+            xlim = (0, 600), ylim = (0, 600),
+            xlabel = "real price", ylabel = "pred price"
+            title = plot_title)
+    savefig("out.png")
+    write("net.dot", mx.to_graphviz(net))
+    run(`dot -Tpng -o net.png net.dot`)
+end
+
+plot_pred(target_test, fit)
 
 result = DataFrame(
     fit = reshape(fit, length(fit)),

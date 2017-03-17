@@ -47,12 +47,13 @@ end
 function get_provider()
     batchsize = 64
 
-    # WTF: if we enable ``suffle``, the optimizer will fail to converge
     trainprovider = mx.ArrayDataProvider(
         :data => data_train,
         :label => target_train,
         batch_size = batchsize,
         shuffle = true,
+        data_padding = 2.0,
+        label_padding = 1.0,
         )
 
     evalprovider = mx.ArrayDataProvider(
@@ -60,44 +61,23 @@ function get_provider()
         :label => target_test,
         batch_size = batchsize,
         shuffle = false,
+        data_padding = 2.0,
+        label_padding = 1.0,
         )
 
     plotprovider = mx.ArrayDataProvider(
-        :data => data_test,
-        :label => target_test
-        )
-
-    trainprovider, evalprovider, plotprovider
-end
-
-function input_2()  # with TA: MACD
-    load([:price, :contract, :mon_σ, :T, :macd])
-
-    batchsize = 64
-
-    trainprovider = mx.ArrayDataProvider(
-        :data => data_train,
-        :label => target_train,
-        batch_size = batchsize,
-        shuffle = true,
-        )
-
-    evalprovider = mx.ArrayDataProvider(
         :data => data_test,
         :label => target_test,
-        batch_size = batchsize,
         shuffle = false,
-        )
-
-    plotprovider = mx.ArrayDataProvider(
-        :data => data_test,
-        :label => target_test
+        data_padding = 2.0,
+        label_padding = 1.0,
         )
 
     trainprovider, evalprovider, plotprovider
 end
 
-trainprovider, evalprovider, plotprovider = input_1()
+input(:orig)
+trainprovider, evalprovider, plotprovider = get_provider()
 
 # create a two hidden layer MPL: try varying num_hidden, and change tanh to relu,
 # or add/remove a layer

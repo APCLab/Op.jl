@@ -29,9 +29,17 @@ function plot_bs()
     savefig("bs.png")
 end
 
-function input_1()
-    load([:price, :contract, :mon_σ, :T])
+function input(model::Symbol)
+    cols = if model == :orig
+        [:price, :contract, :mon_σ, :T]
+    elseif model == :ta  # with TA: MACD
+        [:price, :contract, :mon_σ, :T, :macd]
+    end
 
+    load(cols)
+end
+
+function get_provider()
     batchsize = 64
 
     # WTF: if we enable ``suffle``, the optimizer will fail to converge

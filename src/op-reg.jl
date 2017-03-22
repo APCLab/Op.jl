@@ -26,7 +26,8 @@ function plot_bs()
     scatter(Array(c[train_idx+1:end, :close]),
             Array(c[train_idx+1:end, :BS]),
             xlim=(0, 600), ylim=(0, 600),
-            xlabel="real price", ylabel="pred price")
+            xlabel="real price", ylabel="pred price",
+            title="BS Model")
     savefig("bs.png")
 end
 

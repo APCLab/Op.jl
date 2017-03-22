@@ -22,7 +22,7 @@ function load(col::Array{Symbol})
 end
 
 function plot_bs()
-    load()
+    load([:BS])
     scatter(Array(c[:close]), Array(c[:BS]),
             xlim=(0, 600), ylim=(0, 600),
             xlabel="real price", ylabel="pred price")

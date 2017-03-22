@@ -10,15 +10,15 @@ function load(col::Array{Symbol})
     global cc = readtable("./ccc_macd.csv")
     cc[:mon_σ] *= 100
 
+    global train_idx = Int(round(size(data)[2] * 0.80))
+
     global data = convert(Array{Float64}, cc[col])'
-    global data_idx = Int(round(size(data)[2] * 0.80))
-    global data_train = data[:, 1:data_idx]
-    global data_test = data[:, data_idx+1:end]
+    global data_train = data[:, 1:train_idx]
+    global data_test = data[:, train_idx+1:end]
 
     global target = convert(Array{Float64}, cc[:close])'
-    global target_idx = Int(round(size(target)[2] * 0.80))
-    global target_train = target[:, 1:target_idx]
-    global target_test = target[:, target_idx+1:end]
+    global target_train = target[:, 1:train_idx]
+    global target_test = target[:, train_idx+1:end]
 end
 
 function plot_bs()

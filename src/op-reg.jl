@@ -10,7 +10,9 @@ pyplot()
 # data generating process
 function load(col::Array{Symbol})
     global cc = readtable("./ccc_macd2.csv")
-    cc[:mon_σ] *= 100
+    cc[:price] /= 100
+    cc[:contract] /= 100
+    cc[:mon_σ] *= 10
 
     global data = convert(Array{Float64}, cc[col])'
 

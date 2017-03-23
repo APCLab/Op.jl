@@ -92,12 +92,13 @@ function get_provider()
     trainprovider, evalprovider, plotprovider
 end
 
-function plot_pred(target_test, fit)
+function plot_pred(target_test, fit; name="out.png")
     scatter(target_test', fit',
             xlim = (0, 600), ylim = (0, 600),
             xlabel = "real price", ylabel = "pred price",
             title = plot_title)
-    savefig("out.png")
+    savefig(name)
+
     write("net.dot", mx.to_graphviz(net))
     run(`dot -Tpng -o net.png net.dot`)
 end

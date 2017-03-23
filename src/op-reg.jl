@@ -3,6 +3,8 @@ using Distributions
 using Plots
 using DataFrames
 
+import TimeSeries: TimeArray
+
 pyplot()
 
 # data generating process
@@ -20,6 +22,15 @@ function load(col::Array{Symbol})
     global target = convert(Array{Float64}, cc[:close])'
     global target_train = target[:, 1:train_idx]
     global target_test = target[:, train_idx+1:end]
+end
+
+function load_twii()
+    global twii = readtable("../data/twii.csv")
+
+    d = Date(twii[:date])
+    p = twii[:price]
+
+    ta = TimeArray(d, p)
 end
 
 function plot_bs()

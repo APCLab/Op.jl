@@ -7,12 +7,13 @@ pyplot()
 
 # data generating process
 function load(col::Array{Symbol})
-    global cc = readtable("./ccc_macd.csv")
+    global cc = readtable("./ccc_macd2.csv")
     cc[:mon_σ] *= 100
+
+    global data = convert(Array{Float64}, cc[col])'
 
     global train_idx = Int(round(size(data)[2] * 0.80))
 
-    global data = convert(Array{Float64}, cc[col])'
     global data_train = data[:, 1:train_idx]
     global data_test = data[:, train_idx+1:end]
 

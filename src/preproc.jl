@@ -106,3 +106,23 @@ function strike_price(x)::Float64
     z = y + 100
     (abs(y - x) < abs(z - x)) ? y : z
 end
+
+"""
+Find the index of ``date`` in ``trade_date``
+
+Output is the index of trading date
+"""
+function find_date_idx(trade_date, dates)
+    map(arr) do x
+        find(trade_date .== x)[1]
+    end
+end
+
+function get_T(trade_date, set_date, dates)
+    set_idx = find_date_idx(trade_date, set_date)
+    d_idx = find_date_idx(trade_date, dates)
+
+    map(zip(d_idx, set_idx)) do x
+        x[2] - x[1]
+    end
+end

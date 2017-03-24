@@ -92,7 +92,7 @@ function get_provider()
     trainprovider, evalprovider, plotprovider
 end
 
-function plot_pred(target_test, fit, name::String)
+function plot_pred(target_test, fit, net, name::String)
     scatter(target_test', fit',
             xlim = (0, 600), ylim = (0, 600),
             xlabel = "real price", ylabel = "pred price",

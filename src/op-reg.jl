@@ -157,15 +157,24 @@ function network_factory()
         mx.LinearRegressionOutput(net, label),
         mx.MAERegressionOutput(net, label),
     )
-
     name_postfix = (
         "linreg",
         "mae",
     )
 
+    metrics = (
+        mx.MSE,
+        mx.NMSE,
+    )
+    metric_names = (
+        "mse",
+        "nmse",
+    )
+
     for l ∈ zip(loss_layers, name_postfix)
-        println(l)
-        produce(l)
+        for m ∈ zip(metrics, metric_names)
+            produce((l, m))
+        end
     end
 end
 
@@ -196,7 +205,7 @@ cpus = [mx.cpu(i) for i in 0:3]
 gpu = mx.gpu()
 
 nets = @task network_factory()
-for (net, postfix) ∈ nets
+for ((net, lname), (metric, mname)) ∈ nets
     model = mx.FeedForward(net, context=gpu)
 
     # set up the optimizer: select one, explore parameters, if desired
@@ -209,7 +218,7 @@ for (net, postfix) ∈ nets
     mx.fit(
         model, optimizer,
         initializer = mx.UniformInitializer(0.1),
-        eval_metric = mx.MSE(),
+        eval_metric = metric(),
         trainprovider,
         eval_data = evalprovider,
         n_epoch = epoch)
@@ -220,14 +229,14 @@ for (net, postfix) ∈ nets
     # more training with the full sample
     mx.fit(
         model, optimizer,
-        eval_metric = mx.MSE(),
+        eval_metric = metric(),
         trainprovider,
         eval_data = evalprovider,
         n_epoch = epoch)
 
     fit = mx.predict(model, plotprovider)
 
-    plot_pred(target_test, fit, net, postfix)
+    plot_pred(target_test, fit, net, lname, mname)
 
     result = DataFrame(
         fit = reshape(fit, length(fit)),

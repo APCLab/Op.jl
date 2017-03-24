@@ -106,6 +106,58 @@ function plot_pred(target_test, fit, net, name::String)
     run(`dot -Tpng -o net-$name.png net-$name.dot`)
 end
 
+"""
+Network Factory
+
+Swapping different loss layer:
+    * LinearRegressionOutput
+    * MAERegressionOutput
+"""
+function network_factory()
+    # create a two hidden layer MPL: try varying num_hidden, and change tanh to relu,
+    # or add/remove a layer
+    label = mx.Variable(:label)
+    net =
+        @mx.chain mx.Variable(:data) =>
+                mx.FullyConnected(num_hidden = 1024)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 512)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 256)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 128)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 64)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 32)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 16)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 8)  =>
+                mx.Activation(act_type = :relu) =>
+                mx.FullyConnected(num_hidden = 4)  =>
+                mx.Activation(act_type = :relu) =>
+                #= mx.FullyConnected(num_hidden = 2)  => =#
+                #= mx.Activation(act_type = :relu) => =#
+                mx.FullyConnected(num_hidden = 1)
+                #= mx.LinearRegressionOutput(label) =#
+                #= mx.MAERegressionOutput(label) =#
+
+    loss_layers = (
+        mx.LinearRegressionOutput(net, label),
+        mx.MAERegressionOutput(net, label),
+    )
+
+    name_postfix = (
+        "linreg",
+        "mae",
+    )
+
+    for l ∈ zip(loss_layers, name_postfix)
+        println(l)
+        produce(l)
+    end
+end
 
 input(:orig)
 trainprovider, evalprovider, plotprovider = get_provider()

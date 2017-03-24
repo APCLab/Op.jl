@@ -101,8 +101,8 @@ function plot_pred(target_test, fit, net, lname::String, mname::String)
             title = plot_title)
 
     annotate!([
-        (500 + 2, 110 + 2, text("loss layer = $lname", 10, :black, :left))
-        (500 + 2,  90 - 2, text("metric = $mname", 10, :black, :left))
+        (400 + 2, 110 + 2, text("loss layer = $lname", 10, :black, :left))
+        (400 + 2,  90 - 2, text("metric = $mname", 10, :black, :left))
     ])
 
     name = "$lname-$mname"
@@ -210,7 +210,7 @@ for ((net, lname), (metric, mname)) ∈ nets
 
     # set up the optimizer: select one, explore parameters, if desired
     #= optimizer = mx.SGD(lr=0.001, momentum=0.9, weight_decay=0.00001) =#
-    optimizer = mx.ADAM(weight_decay=0.0001)
+    optimizer = mx.ADAM(weight_decay=0.0002)
 
     # train, reporting loss for training and evaluation sets
     epoch = 100

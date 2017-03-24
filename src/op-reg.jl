@@ -7,6 +7,8 @@ import TimeSeries: TimeArray
 
 pyplot()
 
+out_dir = joinpath(dirname(@__FILE__), "..", "out")
+
 # data generating process
 function load(col::Array{Symbol})
     global cc = readtable("./ccc_macd2.csv")
@@ -42,7 +44,7 @@ function plot_bs()
             xlim=(0, 600), ylim=(0, 600),
             xlabel="real price", ylabel="pred price",
             title="BS Model")
-    savefig("bs.png")
+    savefig(joinpath(out_dir, "bs.png"))
 end
 
 function input(model::Symbol)
@@ -92,18 +94,26 @@ function get_provider()
     trainprovider, evalprovider, plotprovider
 end
 
-function plot_pred(target_test, fit, net, name::String)
+function plot_pred(target_test, fit, net, lname::String, mname::String)
     scatter(target_test', fit',
             xlim = (0, 600), ylim = (0, 600),
             xlabel = "real price", ylabel = "pred price",
             title = plot_title)
 
-    annotate!([(500 + 2, 110 + 2, text(name, 10, :black, :left))])
+    annotate!([
+        (500 + 2, 110 + 2, text("loss layer = $lname", 10, :black, :left))
+        (500 + 2,  90 - 2, text("metric = $mname", 10, :black, :left))
+    ])
 
-    savefig("out-$name.png")
+    name = "$lname-$mname"
 
-    write("net-$name.dot", mx.to_graphviz(net))
-    run(`dot -Tpng -o net-$name.png net-$name.dot`)
+    savefig(joinpath(out_dir, "out-$name.png"))
+
+    dot_file = joinpath(out_dir, "net-$name.dot")
+    net_pic = joinpath(out_dir, "net-$name.png")
+
+    write(dot_file, mx.to_graphviz(net))
+    run(`dot -Tpng -o $net_pic $dot_file`)
 end
 
 """

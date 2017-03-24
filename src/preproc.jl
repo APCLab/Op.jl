@@ -76,20 +76,28 @@ function σ_his()
     df = DataFrame([String, Float64, Float64], [:date, :close, :ret], 0)
     [push!(df, [r["key"], r["value"], NaN]) for r ∈ rows]
 
-    returns = [(df[i, :close] - df[i - 1, :close]) /  df[i - 1, :close]
-               for i ∈ 2:length(df[:close])]
-    prepend!(returns, [NaN])
-
-    df[:ret] = returns
-    df[:year_σ] = σ_interval(252, returns)
-    df[:mon_σ] = σ_interval(20, returns)
+    df[:year_σ] = σ_interval(252, 30, df)
+    df[:mon_σ] = σ_interval(22, 30, df)
+    df[:daily_σ] = σ_interval(1, 30, df)
     df
 end
 
-
-σ_interval(i::Int64, returns::Array) = [
-    ((idx < i + 1) ? NaN : std(returns[idx - i:idx]))
-    for idx ∈ 1:length(returns)] * 100 * √252
+"""
+:param int: interval
+:param smp: sampling number for volatility
+"""
+function σ_interval(int::Int64, smp::Int64, df::DataFrame)
+    returns = [
+        (i < 1 + int) ?
+        NaN : ((df[i, :close] - df[i - int, :close]) / df[i - int, :close])
+        for i ∈ 1:length(df[:close])
+    ]
+    [
+        (idx < 1 + smp) ?
+        NaN : std(returns[idx - smp:idx])
+        for idx ∈ 1:length(returns)
+    ] * √(252.0 / int)
+end
 
 
 "round to nearest strike price"

@@ -9,7 +9,7 @@ using DataFrames
         ["2016-11-15", "TXO", "201611", "C", "9000"]
     ]
 """
-function fetch(keys::Array)
+function _fetch(keys::Array)
     server = get(ENV, "COUCH_SERVER", "localhost")
     base_url = "http://$server:5984"
     view = "/market/_design/options/_view/txo?reduce=false&limit=5"

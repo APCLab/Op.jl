@@ -101,7 +101,7 @@ function plot_pred(target_test, fit, net, lname::String, mname::String)
             title = plot_title)
 
     annotate!([
-        (400 + 2, 110 + 2, text("loss layer = $lname", 10, :black, :left))
+        (400 + 2, 110 + 2, text("loss layer =  $lname", 10, :black, :left))
         (400 + 2,  90 - 2, text("metric = $mname", 10, :black, :left))
     ])
 

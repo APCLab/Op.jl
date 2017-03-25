@@ -1,7 +1,10 @@
 using HTTP
 using JSON
 using DataFrames
+using Plots
 
+out_dir = joinpath(dirname(@__FILE__), "..", "out")
+plot_size = (4000, 800)
 
 """
 :param key:
@@ -86,9 +89,7 @@ doc"""
 :param int: interval
 :param smp: sampling number for volatility
 
-Price change caculation:
-
-::
+Price change caculation::
 
     ln \frac{P_{t+1}}{P}
 """
@@ -103,6 +104,20 @@ function σ_interval(int::Int64, smp::Int64, df::DataFrame)
         NaN : std(returns[idx - smp:idx])
         for idx ∈ 1:length(returns)
     ] * √(252.0 / int)
+end
+
+function plot_σ()
+    pyplot()
+    σ = σ_his()
+
+    σ[:year_σ] *= 100
+    σ[:mon_σ] *= 100
+    σ[:daily_σ] *= 100
+
+    plot(σ[:year_σ], ylabel="σ (%)", label=:year, size=plot_size)
+    plot!(σ[:mon_σ], label=:mon)
+    plot!(σ[:daily_σ], label=:daily)
+    savefig(joinpath(out_dir, "vola.png"))
 end
 
 "round to nearest strike price"

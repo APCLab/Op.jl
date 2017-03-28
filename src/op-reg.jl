@@ -8,6 +8,15 @@ import TimeSeries: TimeArray
 pyplot()
 
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
+plot_size = (1200, 800)
+
+"""
+Mean Normalization
+
+:param arr: the DataArray
+:return: a normalized DataArray
+"""
+norm_col(arr::AbstractArray) = (arr - mean(arr)) / std(arr)
 
 # data generating process
 function load(col::Array{Symbol})

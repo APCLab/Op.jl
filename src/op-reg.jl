@@ -48,8 +48,8 @@ end
 
 function plot_bs()
     load([:BS])
-    scatter(Array(c[train_idx+1:end, :close]),
-            Array(c[train_idx+1:end, :BS]),
+    scatter(Array(cc[train_idx+1:end, :close]),
+            Array(cc[train_idx+1:end, :BS]),
             xlim=(0, 600), ylim=(0, 600),
             xlabel="real price", ylabel="pred price",
             title="BS Model",

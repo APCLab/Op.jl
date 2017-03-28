@@ -52,7 +52,8 @@ function plot_bs()
             Array(c[train_idx+1:end, :BS]),
             xlim=(0, 600), ylim=(0, 600),
             xlabel="real price", ylabel="pred price",
-            title="BS Model")
+            title="BS Model",
+            size=plot_size)
     savefig(joinpath(out_dir, "bs.png"))
 end
 
@@ -105,9 +106,10 @@ end
 
 function plot_pred(target_test, fit, net, lname::String, mname::String)
     scatter(target_test', fit',
-            xlim = (0, 600), ylim = (0, 600),
-            xlabel = "real price", ylabel = "pred price",
-            title = plot_title)
+            xlim=(0, 600), ylim=(0, 600),
+            xlabel="real price", ylabel="pred price",
+            title=plot_title,
+            size=plot_size)
 
     annotate!([
         (400 + 2, 110 + 2, text("loss layer =  $lname", 10, :black, :left))

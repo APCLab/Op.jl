@@ -40,14 +40,6 @@ function load(cols::Array{Symbol})
     global target_test = target[:, train_idx+1:end]
 end
 
-function load_twii()
-    global twii = readtable("../data/twii.csv")
-
-    d = Date(twii[:date])
-    p = twii[:price]
-
-    ta = TimeArray(d, p)
-end
 
 function plot_bs()
     load([:BS])

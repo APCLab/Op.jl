@@ -27,6 +27,7 @@ function load(cols::Array{Symbol})
     cc[:price] /= 100
     cc[:contract] /= 100
     cc[:mon_σ] *= 100
+    cc[:sma] /= 100
 
     global data = convert(Array{Float64}, cc[cols])'
 
@@ -60,11 +61,17 @@ function input(model::Symbol)
 
         [:price, :contract, :mon_σ, :T]
 
-    elseif model == :ta  # with TA: MACD
-        global plot_title = "P, P_s, σ_month, T, MACD"
+    elseif model == :ta  # with TA: MACD + MA(20)
+        global plot_title = "P, P_s, σ_month, T, MACD, MA"
         global iname = "model2"
 
-        [:price, :contract, :mon_σ, :T, :macd]
+        [:price, :contract, :mon_σ, :T, :dif, :sma]
+
+    elseif model == :bs  # with TA & BS
+        global plot_title = "P, P_s, σ_month, T, MACD, MA, BS"
+        global iname = "model3"
+
+        [:price, :contract, :mon_σ, :T, :dif, :sma, :BS]
     end
 
     load(cols)
@@ -196,8 +203,9 @@ function network_factory()
     end
 end
 
-input(:orig)
+#= input(:orig) =#
 #= input(:ta) =#
+input(:bs)
 trainprovider, evalprovider, plotprovider = get_provider()
 
 #= loss = mx.MakeLoss( =#

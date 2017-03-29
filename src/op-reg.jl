@@ -18,14 +18,17 @@ Mean Normalization
 """
 norm_col(arr::AbstractArray) = (arr - mean(arr)) / std(arr)
 
+
 # data generating process
-function load(col::Array{Symbol})
+function load(cols::Array{Symbol})
     global cc = readtable("./ccc_macd2.csv")
+
+    # roughly normalize
     cc[:price] /= 100
     cc[:contract] /= 100
-    cc[:mon_σ] *= 10
+    cc[:mon_σ] *= 100
 
-    global data = convert(Array{Float64}, cc[col])'
+    global data = convert(Array{Float64}, cc[cols])'
 
     global train_idx = Int(round(size(data)[2] * 0.80))
 

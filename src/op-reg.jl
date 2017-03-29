@@ -52,20 +52,24 @@ function plot_bs()
     savefig(joinpath(out_dir, "bs.png"))
 end
 
+
 function input(model::Symbol)
     cols = if model == :orig
         global plot_title = "P, P_s, σ_month, T"
+        global iname = "model1"
 
         [:price, :contract, :mon_σ, :T]
 
     elseif model == :ta  # with TA: MACD
         global plot_title = "P, P_s, σ_month, T, MACD"
+        global iname = "model2"
 
         [:price, :contract, :mon_σ, :T, :macd]
     end
 
     load(cols)
 end
+
 
 function get_provider()
     batchsize = 64
@@ -99,7 +103,14 @@ function get_provider()
     trainprovider, evalprovider, plotprovider
 end
 
-function plot_pred(target_test, fit, net, lname::String, mname::String)
+
+"""
+:param iname: input data name
+:param lname: layer name
+:param mname: metric name
+"""
+function plot_pred(target_test, fit, net,
+                   iname::String, lname::String, mname::String)
     scatter(target_test', fit',
             xlim=(0, 600), ylim=(0, 600),
             xlabel="real price", ylabel="pred price",
@@ -111,7 +122,7 @@ function plot_pred(target_test, fit, net, lname::String, mname::String)
         (400 + 2,  90 - 2, text("metric = $mname", 10, :black, :left))
     ])
 
-    name = "$lname-$mname"
+    name = "$iname-$lname-$mname"
 
     savefig(joinpath(out_dir, "out-$name.png"))
 
@@ -121,6 +132,7 @@ function plot_pred(target_test, fit, net, lname::String, mname::String)
     write(dot_file, mx.to_graphviz(net))
     run(`dot -Tpng -o $net_pic $dot_file`)
 end
+
 
 """
 Network Factory
@@ -242,7 +254,7 @@ for ((net, lname), (metric, mname)) ∈ nets
 
     fit = mx.predict(model, plotprovider)
 
-    plot_pred(target_test, fit, net, lname, mname)
+    plot_pred(target_test, fit, net, iname, lname, mname)
 
     result = DataFrame(
         fit = reshape(fit, length(fit)),

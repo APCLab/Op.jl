@@ -1,7 +1,8 @@
+using DataFrames
 using HTTP
 using JSON
-using DataFrames
 using Plots
+using TimeArray
 
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
 plot_size = (4000, 800)
@@ -153,7 +154,7 @@ end
 
 
 function load_twii()
-    global twii = readtable(joinpath(@__FILE__, "..", "data", "twii.csv"))
+    global twii = readtable(joinpath(dirname(@__FILE__), "..", "data", "twii.csv"))
 
     d = Date(twii[:date])
     p = twii[:price]

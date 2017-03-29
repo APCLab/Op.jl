@@ -2,7 +2,7 @@ using DataFrames
 using HTTP
 using JSON
 using Plots
-using TimeArray
+using TimeSeries
 
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
 plot_size = (4000, 800)

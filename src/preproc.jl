@@ -76,7 +76,7 @@ function σ_his()
     res = HTTP.get(url, headers = headers)
     rows = JSON.parse(string(res))["rows"]
 
-    df = DataFrame([String, Float64, Float64], [:date, :close, :ret], 0)
+    df = DataFrame([String, Float64], [:date, :close], 0)
     [push!(df, [r["key"], r["value"], NaN]) for r ∈ rows]
 
     df[:year_σ] = σ_interval(252, 22, df)
@@ -84,6 +84,7 @@ function σ_his()
     df[:daily_σ] = σ_interval(1, 22, df)
     df
 end
+
 
 doc"""
 :param int: interval
@@ -106,6 +107,7 @@ function σ_interval(int::Int64, smp::Int64, df::DataFrame)
     ] * √(252.0 / int)
 end
 
+
 function plot_σ()
     pyplot()
     σ = σ_his()
@@ -127,6 +129,7 @@ function strike_price(x)::Float64
     (abs(y - x) < abs(z - x)) ? y : z
 end
 
+
 """
 Find the index of ``date`` in ``trade_date``
 
@@ -138,6 +141,7 @@ function find_date_idx(trade_date, dates)
     end
 end
 
+
 function get_T(trade_date, set_date, dates)
     set_idx = find_date_idx(trade_date, set_date)
     d_idx = find_date_idx(trade_date, dates)
@@ -145,4 +149,14 @@ function get_T(trade_date, set_date, dates)
     map(zip(d_idx, set_idx)) do x
         x[2] - x[1]
     end
+end
+
+
+function load_twii()
+    global twii = readtable(joinpath(@__FILE__, "..", "data", "twii.csv"))
+
+    d = Date(twii[:date])
+    p = twii[:price]
+
+    ta = TimeArray(d, p)
 end

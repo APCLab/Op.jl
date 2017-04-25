@@ -7,6 +7,7 @@ using TimeSeries
 
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
 data_dir = joinpath(dirname(@__FILE__), "..", "data")
+data_jld = joinpath(data_dir, "data.jld")
 plot_size = (4000, 800)
 
 """
@@ -169,11 +170,11 @@ end
 convert setdate csv to jld
 """
 function setdate()
-    df = DataFrames("./setdate.csv")
+    df = DataFrames(joinpath(data_dir, "setdate.csv"))
     df[:date] = map(x -> Date(x), df[:date])
     df[:contract] = map(x -> string(x), df[:contract])
 
-    jldopen("data.jld", "w") do f
+    jldopen(data_jld, "w") do f
         addrequire(f, DataFrames)
         write(f, "setdate", df)
     end

@@ -1,5 +1,6 @@
 using DataFrames
 using HTTP
+using JLD
 using JSON
 using Plots
 using TimeSeries
@@ -161,4 +162,19 @@ function load_twii()
     p = twii[:price]
 
     ta = TimeArray(d, p)
+end
+
+
+"""
+convert setdate csv to jld
+"""
+function setdate()
+    df = DataFrames("./setdate.csv")
+    df[:date] = map(x -> Date(x), df[:date])
+    df[:contract] = map(x -> string(x), df[:contract])
+
+    jldopen("data.jld", "w") do f
+        addrequire(f, DataFrames)
+        write(f, "setdate", df)
+    end
 end

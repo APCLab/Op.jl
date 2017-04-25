@@ -5,6 +5,7 @@ using Plots
 using TimeSeries
 
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
+data_dir = joinpath(dirname(@__FILE__), "..", "data")
 plot_size = (4000, 800)
 
 """
@@ -154,7 +155,7 @@ end
 
 
 function load_twii()
-    global twii = readtable(joinpath(dirname(@__FILE__), "..", "data", "twii.csv"))
+    global twii = readtable(joinpath(data_dir, "twii.csv"))
 
     d = Date(twii[:date])
     p = twii[:price]

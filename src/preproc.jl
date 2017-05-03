@@ -169,13 +169,21 @@ end
 """
 convert setdate csv to jld
 """
-function setdate()
-    df = DataFrames(joinpath(data_dir, "setdate.csv"))
-    df[:date] = map(x -> Date(x), df[:date])
-    df[:contract] = map(x -> string(x), df[:contract])
+function setdates()
+    df = readtable(joinpath(data_dir, "setdates.csv"))
+    df[:Date] = Date.(df[:Date])
+    df[:Contract] = map(string, (df[:Contract]))
+    write_jld("setdates", df)
+    df
+end
 
+
+"""
+Write DataFrame to jld file
+"""
+function write_jld(name::AbstractString, df::DataFrame)
     jldopen(data_jld, "w") do f
         addrequire(f, DataFrames)
-        write(f, "setdate", df)
+        write(f, name, df)
     end
 end

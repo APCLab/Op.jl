@@ -192,6 +192,16 @@ function load_setdates(group=true, write=false)
 end
 
 
+function load_tx()
+    tx = readtable(joinpath(data_dir, "tx.csv"))
+    delete!(tx, :x)
+    tx[:Date] = Date.(tx[:Date])
+
+    s = load_setdates(false, false)
+    join(tx, s, on=[:Date, :Contract])
+end
+
+
 """
 Write DataFrame to jld file
 """

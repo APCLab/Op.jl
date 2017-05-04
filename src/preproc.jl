@@ -211,3 +211,31 @@ function write_jld(name::AbstractString, df::DataFrame)
         write(f, name, df)
     end
 end
+
+
+function jld_del(name::AbstractString)
+    jldopen(data_jld, "r+") do f
+        delete!(f, name)
+    end
+end
+
+
+function get_txo()
+    df = load(data_jld, "txo")
+
+    df[df[:T] .> 3, :]
+    df[:BS_err] = df[:BS] .- df[:Close]
+
+    df
+end
+
+
+function get_macd_sma()
+    tx = load_tx()
+    ta = TimeArray(Vector(tx[:Date]), Vector(tx[:Close]))
+    m = macd(ta)
+    ma = sma(ta, 20)
+    t = DataFrame(Date=m.timestamp, Dif=m.values[:, 2])
+    t2 = DataFrame(Date=ma.timestamp, SMA=ma.values[:, 1])
+    join(join(tx, t, on=:Date), t2, on=:Date)
+end

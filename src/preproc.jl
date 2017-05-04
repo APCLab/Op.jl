@@ -204,7 +204,6 @@ end
 
 function load_tx()
     tx = readtable(joinpath(data_dir, "tx.csv"))
-    delete!(tx, :x)
     tx[:Date] = Date.(tx[:Date])
 
     s = load_setdates(false, false)
@@ -215,9 +214,14 @@ end
 """
 Write DataFrame to jld file
 """
-function write_jld(name::AbstractString, df::DataFrame)
+function write_jld(name::AbstractString, df::DataFrame; rewrite=true)
     jldopen(data_jld, "r+") do f
         addrequire(f, DataFrames)
+
+        if rewrite && exists(f, name)
+            delete!(f, name)
+        end
+
         write(f, name, df)
     end
 end
@@ -230,6 +234,9 @@ function jld_del(name::AbstractString)
 end
 
 
+"""
+Get TXO with simple filter
+"""
 function get_txo()
     df = load(data_jld, "txo")
 

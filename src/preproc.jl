@@ -84,9 +84,9 @@ function σ_his()
     df = DataFrame([String, Float64], [:date, :close], 0)
     [push!(df, [r["key"], r["value"], NaN]) for r ∈ rows]
 
-    df[:year_σ] = σ_interval(252, 22, df)
-    df[:mon_σ] = σ_interval(22, 22, df)
-    df[:daily_σ] = σ_interval(1, 22, df)
+    df[:year_σ] = σ_interval(252, 21, df)
+    df[:mon_σ] = σ_interval(22, 21, df)
+    df[:daily_σ] = σ_interval(1, 21, df)
     df
 end
 

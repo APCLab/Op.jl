@@ -206,7 +206,7 @@ end
 Write DataFrame to jld file
 """
 function write_jld(name::AbstractString, df::DataFrame)
-    jldopen(data_jld, "w") do f
+    jldopen(data_jld, "r+") do f
         addrequire(f, DataFrames)
         write(f, name, df)
     end

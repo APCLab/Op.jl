@@ -22,14 +22,14 @@ norm_col(arr::AbstractArray) = (arr - mean(arr)) / std(arr)
 
 
 # data generating process
-function load(cols::Array{Symbol})
-    global cc = readtable("./ccc_macd2.csv")
+function load_dataset(cols::Array{Symbol})
+    global cc = get_txo()
 
-    # roughly normalize
-    cc[:price] /= 100
-    cc[:contract] /= 100
-    cc[:mon_σ] *= 100
-    cc[:sma] /= 100
+    # roughly rescaling
+    cc[:S] /= 100
+    cc[:Strike] /= 100
+    cc[:σ] *= 100
+    cc[:SMA] /= 100
 
     global data = convert(Array{Float64}, cc[cols])'
 

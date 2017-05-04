@@ -187,21 +187,21 @@ function network_factory()
                 #= mx.MAERegressionOutput(label) =#
 
     loss_layers = (
-        mx.LinearRegressionOutput(net, label),
+        #= mx.LinearRegressionOutput(net, label), =#
         mx.MAERegressionOutput(net, label),
     )
     name_postfix = (
-        "linreg",
+        #= "linreg", =#
         "mae",
     )
 
     metrics = (
         mx.MSE,
-        mx.NMSE,
+        #= mx.NMSE, =#
     )
     metric_names = (
         "mse",
-        "nmse",
+        #= "nmse", =#
     )
 
     for l ∈ zip(loss_layers, name_postfix)
@@ -211,18 +211,6 @@ function network_factory()
     end
 end
 
-#= input(:orig) =#
-#= input(:ta) =#
-input(:bs)
-trainprovider, evalprovider, plotprovider = get_provider()
-
-#= loss = mx.MakeLoss( =#
-#=     mx.Activation(abs(net .- label) ./ label, act_type=:sigmoid), =#
-#=     grad_scale = 10, =#
-#=     name = :loss, =#
-#=     #= normalization = "batch", =# =#
-#= ) =#
-#= net = mx.Group(mx.BlockGrad(net), loss) =#
 
 # simple small net for quick test
 #= net_qtest = =#
@@ -238,41 +226,65 @@ trainprovider, evalprovider, plotprovider = get_provider()
 cpus = [mx.cpu(i) for i in 0:3]
 gpu = mx.gpu()
 
-nets = @task network_factory()
-for ((net, lname), (metric, mname)) ∈ nets
-    model = mx.FeedForward(net, context=gpu)
+function train_test()
+    nets = @task network_factory()
+    for ((net, lname), (metric, mname)) ∈ nets
+        model = mx.FeedForward(net, context=gpu)
 
-    # set up the optimizer: select one, explore parameters, if desired
-    #= optimizer = mx.SGD(lr=0.001, momentum=0.9, weight_decay=0.00001) =#
-    optimizer = mx.ADAM(weight_decay=0.0002)
+        # set up the optimizer: select one, explore parameters, if desired
+        #= optimizer = mx.SGD(lr=0.001, momentum=0.9, weight_decay=0.0001) =#
+        optimizer = mx.ADAM(lr=0.0001, weight_decay=0.005)
 
-    # train, reporting loss for training and evaluation sets
-    epoch = 100
-    # initial training with small batch size, to get to a good neighborhood
-    mx.fit(
-        model, optimizer,
-        initializer = mx.UniformInitializer(0.1),
-        eval_metric = metric(),
-        trainprovider,
-        eval_data = evalprovider,
-        n_epoch = epoch)
+        # train, reporting loss for training and evaluation sets
+        epoch = 1000
+        # initial training with small batch size, to get to a good neighborhood
+        mx.fit(
+            model, optimizer,
+            #= initializer = mx.UniformInitializer(0.1), =#
+            initializer = mx.NormalInitializer(mu=0, sigma=0.2),
+            eval_metric = metric(),
+            trainprovider,
+            eval_data = evalprovider,
+            n_epoch = epoch,
+            # https://github.com/dmlc/MXNet.jl/issues/78
+            callbacks = [
+                mx.do_checkpoint(joinpath(out_dir, iname), save_epoch_0=true)
+                ]
+            )
 
-    fit = mx.predict(model, plotprovider)
-    #= plot_pred(target_test, fit; name="out-pre.png") =#
+        fit = mx.predict(model, plotprovider)
 
-    # more training with the full sample
-    mx.fit(
-        model, optimizer,
-        eval_metric = metric(),
-        trainprovider,
-        eval_data = evalprovider,
-        n_epoch = epoch)
+        # more training with the full sample
+        mx.fit(
+            model, optimizer,
+            eval_metric = metric(),
+            trainprovider,
+            eval_data = evalprovider,
+            n_epoch = epoch,
+            callbacks = [
+                mx.do_checkpoint(joinpath(out_dir, iname), save_epoch_0=true)
+                ]
+            )
 
-    fit = mx.predict(model, plotprovider)
+        fit = mx.predict(model, plotprovider)
 
-    plot_pred(target_test, fit, net, iname, lname, mname)
+        plot_pred(target_test, fit, net, iname, lname, mname)
 
-    result = DataFrame(
-        fit = reshape(fit, length(fit)),
-        real = reshape(target_test, length(target_test)))
+        result = DataFrame(
+            fit = reshape(fit, length(fit)),
+            real = reshape(target_test, length(target_test)))
+
+        name = "$iname-$lname-$mname"
+    end
+end
+
+for i ∈ [:orig, :ta, :bs, :bs_err]
+    input(i)
+
+    global trainprovider
+    global evalprovider
+    global plotprovider
+    trainprovider, evalprovider, plotprovider = get_provider()
+
+    train_test()
 end

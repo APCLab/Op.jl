@@ -102,8 +102,8 @@ Price change caculation::
 function σ_interval(int::Int64, smp::Int64, df::DataFrame)
     returns = [
         (i < 1 + int) ?
-        NaN : (log(df[i, :close] / df[i - int, :close]))
-        for i ∈ 1:length(df[:close])
+        NaN : (log(df[i, :Close] / df[i - int, :Close]))
+        for i ∈ 1:length(df[:Close])
     ]
     [
         (idx < 1 + smp) ?
@@ -170,7 +170,7 @@ end
 """
 convert setdate csv to jld
 """
-function setdates()
+function load_setdates(group=true, write=false)
     df = readtable(joinpath(data_dir, "setdates.csv"))
     df[:Date] = Date.(df[:Date])
     df[:Contract] = map(string, (df[:Contract]))

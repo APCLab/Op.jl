@@ -10,6 +10,7 @@ pyplot()
 
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
 plot_size = (1200, 800)
+plot_rng = 1000  # ploting range for x and y axis
 
 """
 Mean Normalization
@@ -47,7 +48,7 @@ function plot_bs()
     load([:BS])
     scatter(Array(cc[train_idx+1:end, :close]),
             Array(cc[train_idx+1:end, :BS]),
-            xlim=(0, 600), ylim=(0, 600),
+            xlim=(0, plot_rng), ylim=(0, plot_rng),
             xlabel="real price", ylabel="pred price",
             title="BS Model",
             size=plot_size)
@@ -120,7 +121,7 @@ end
 function plot_pred(target_test, fit, net,
                    iname::String, lname::String, mname::String)
     scatter(target_test', fit',
-            xlim=(0, 600), ylim=(0, 600),
+            xlim=(0, plot_rng), ylim=(0, plot_rng),
             xlabel="real price", ylabel="pred price",
             title=plot_title,
             size=plot_size)

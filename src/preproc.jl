@@ -157,6 +157,16 @@ function get_T(trade_date, set_date, dates)
 end
 
 
+"""
+Create empty jld
+"""
+function create_jld()
+    jldopen(data_jld, "w") do f
+        addrequire(f, DataFrames)
+    end
+end
+
+
 function load_twii()
     global twii = readtable(joinpath(data_dir, "twii.csv"))
 

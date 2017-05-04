@@ -4,6 +4,7 @@ using JLD
 using JSON
 using Plots
 using TimeSeries
+using MarketTechnicals
 
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
 data_dir = joinpath(dirname(@__FILE__), "..", "data")

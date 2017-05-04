@@ -1,8 +1,9 @@
 julia 0.6
+DataFrames
 Distributions
 HTTP
+JLD
 JSON
-DataFrames
 Plots
 PyPlot
 TimeSeries

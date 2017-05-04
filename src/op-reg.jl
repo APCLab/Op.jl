@@ -38,15 +38,15 @@ function load_dataset(cols::Array{Symbol})
     global data_train = data[:, 1:train_idx]
     global data_test = data[:, train_idx+1:end]
 
-    global target = convert(Array{Float64}, cc[:close])'
+    global target = convert(Array{Float64}, cc[:Close])'
     global target_train = target[:, 1:train_idx]
     global target_test = target[:, train_idx+1:end]
 end
 
 
 function plot_bs()
-    load([:BS])
-    scatter(Array(cc[train_idx+1:end, :close]),
+    load_dataset([:BS])
+    scatter(Array(cc[train_idx+1:end, :Close]),
             Array(cc[train_idx+1:end, :BS]),
             xlim=(0, plot_rng), ylim=(0, plot_rng),
             xlabel="real price", ylabel="pred price",
@@ -61,22 +61,28 @@ function input(model::Symbol)
         global plot_title = "P, P_s, σ_month, T"
         global iname = "model1"
 
-        [:price, :contract, :mon_σ, :T]
+        [:S, :Strike, :σ, :T]
 
     elseif model == :ta  # with TA: MACD + MA(20)
         global plot_title = "P, P_s, σ_month, T, MACD, MA"
         global iname = "model2"
 
-        [:price, :contract, :mon_σ, :T, :dif, :sma]
+        [:S, :Strike, :σ, :T, :Dif, :SMA]
 
     elseif model == :bs  # with TA & BS
         global plot_title = "P, P_s, σ_month, T, MACD, MA, BS"
         global iname = "model3"
 
-        [:price, :contract, :mon_σ, :T, :dif, :sma, :BS]
+        [:S, :Strike, :σ, :T, :Dif, :SMA, :BS]
+
+    elseif model == :bs_err  # with TA & BS
+        global plot_title = "P, P_s, σ_month, T, MACD, MA, BS_err"
+        global iname = "model4"
+
+        [:S, :Strike, :σ, :T, :Dif, :SMA, :BS_err]
     end
 
-    load(cols)
+    load_dataset(cols)
 end
 
 

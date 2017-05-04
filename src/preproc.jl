@@ -174,7 +174,20 @@ function load_setdates(group=true, write=false)
     df = readtable(joinpath(data_dir, "setdates.csv"))
     df[:Date] = Date.(df[:Date])
     df[:Contract] = map(string, (df[:Contract]))
-    write_jld("setdates", df)
+    delete!(df, :Symbol)
+
+    if group
+        df = DataFrame()
+        for g in groupby(df, :Contract)
+            df = vcat(df, g[end, :])
+        end
+    end
+
+    if write
+        rename!(df, :Date, :Settlement)
+        write_jld("setdates", df)
+    end
+
     df
 end
 

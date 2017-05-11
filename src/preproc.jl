@@ -293,6 +293,7 @@ function get_txo()
     df
 end
 
+get_tx() = load(data_jld, "tx")
 
 function get_macd_sma()
     tx = load_tx()

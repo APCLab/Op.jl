@@ -187,10 +187,12 @@ function load_setdates(group=true, write=false)
     delete!(df, :Symbol)
 
     if group
-        df = DataFrame()
+        gdf = DataFrame()
         for g in groupby(df, :Contract)
-            df = vcat(df, g[end, :])
+            gdf = vcat(gdf, g[end, :])
         end
+        rename!(gdf, :Date, :Settlement)
+        return gdf
     end
 
     if write

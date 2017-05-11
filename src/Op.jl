@@ -1,5 +1,6 @@
 module Op
 
+using DataFrames
 using Distributions: cdf, pdf, Normal
 
 export C

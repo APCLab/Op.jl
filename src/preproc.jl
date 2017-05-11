@@ -207,12 +207,53 @@ function load_setdates(group=true, write=false)
 end
 
 
-function load_tx()
+function load_tx(; write=false)
     tx = readtable(joinpath(data_dir, "tx.csv"))
-    tx[:Date] = Date.(tx[:Date])
 
+    # type convert
+    tx[:Date] = Date.(tx[:Date])
+    for col ∈ [:Open, :High, :Low, :Close]
+        tx[col] = Float64.(tx[col])
+    end
+
+    # filter out the nearest month contract
     s = load_setdates(false, false)
-    join(tx, s, on=[:Date, :Contract])
+    tx = join(tx, s, on=[:Date, :Contract])
+
+    # add Settlement date column
+    s = load_setdates()
+    tx = join(tx, s, on=[:Contract])
+
+    tx[:T] = Int.(tx[:Settlement] .- tx[:Date])
+
+    # for simpifying task, using close of 08:45 to calculate volatility
+    g = groupby(tx, :Time)[1]
+    vola = σ_interval(1, 21, g)
+    tx = join(tx, DataFrame(Date=g[:Date], σ=vola), on=[:Date])
+
+    # kama
+    g = groupby(tx, :Time)[2]
+    ta = kama(TimeArray(Array(g[:Date]), Array(g[:Open])))
+    darr = DataArray(ta.values)
+    k = padNA(darr, length(g[:Date]) - length(ta), 0)
+    df = DataFrame(Date=g[:Date], Time=g[:Time], KAMA=k)
+    tx = join(tx, df, on=[:Date, :Time], kind=:left)
+
+    # macd
+    g = groupby(tx, :Time)[2]
+    ta = macd(TimeArray(Array(g[:Date]), Array(g[:Open])))["dif"]
+    darr = DataArray(ta.values)
+    dif = padNA(darr, length(g[:Date]) - length(ta), 0)
+    df = DataFrame(Date=g[:Date], Time=g[:Time], DIF=dif)
+    tx = join(tx, df, on=[:Date, :Time], kind=:left)
+
+    if write
+        write_jld("tx", tx; rewrite=true)
+    end
+
+    tx
+end
+
 end
 
 
@@ -224,6 +265,7 @@ function write_jld(name::AbstractString, df::DataFrame; rewrite=true)
         addrequire(f, DataFrames)
 
         if rewrite && exists(f, name)
+            println("rewrite $name")
             delete!(f, name)
         end
 

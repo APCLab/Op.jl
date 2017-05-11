@@ -6,6 +6,9 @@ using MarketTechnicals
 using Plots
 using TimeSeries
 
+using HDF5: exists
+
+
 out_dir = joinpath(dirname(@__FILE__), "..", "out")
 data_dir = joinpath(dirname(@__FILE__), "..", "data")
 data_jld = joinpath(data_dir, "data.jld")

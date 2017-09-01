@@ -1,3 +1,6 @@
+using Distributions: pdf, cdf, Normal
+
+
 """
 Call price of Black-scholes Model
 
@@ -9,10 +12,10 @@ Call price of Black-scholes Model
 
 :param round: round small value to ``0.1``, default is ``false``
 """
-function C{F<:Float64,M}(S::AbstractArray{F,M}, L::AbstractArray{F,M},
-                         T::AbstractArray{F,M}, σ::AbstractArray{F,M},
-                         r::Real = log(1.04);
-                         round=false)
+function C(S::AbstractArray{F, N}, L::AbstractArray{F, N},
+           T::AbstractArray{F, N}, σ::AbstractArray{F, N},
+           r::Real = log(1.04);
+           round=false) where {F <: AbstractFloat, N}
     c = S .* N(D1(S, L, T, σ, r)) - L .* e.^(-r .* T) .* N(D2(S, L, T, σ, r))
 
     if round == false
@@ -28,10 +31,14 @@ function C{F<:Float64,M}(S::AbstractArray{F,M}, L::AbstractArray{F,M},
     end
 end
 
+
 D1(S, L, T, σ, r = 1.04) =
     (log(S ./ L) .+ (r + 0.5 * σ.^2) .* T) ./ (σ .* √T)
+
+
 D2(S, L, T, σ, r = 1.04) =
     (log(S ./ L) .+ (r - 0.5 * σ.^2) .* T) ./ (σ .* √T)
+
 
 function N{T<:Float64,M}(x::AbstractArray{T,M})
     ret = similar(x)
@@ -44,8 +51,10 @@ function N{T<:Float64,M}(x::AbstractArray{T,M})
     ret
 end
 
+
 vega(S, L, T, σ, r = 1.04) =
     S .* pdf(Normal(), D1(S, L, T, σ, r)) .* √T
+
 
 """
 http://quant.stackexchange.com/questions/7761

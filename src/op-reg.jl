@@ -228,8 +228,6 @@ function train_test()
         #= optimizer = mx.SGD(lr=0.001, momentum=0.9, weight_decay=0.0001) =#
         optimizer = mx.ADAM(lr=0.0001, weight_decay=0.005)
 
-        # train, reporting loss for training and evaluation sets
-        epoch = 1000
         # initial training with small batch size, to get to a good neighborhood
         mx.fit(
             model, optimizer,

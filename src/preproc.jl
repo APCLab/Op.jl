@@ -8,11 +8,8 @@ using TimeSeries
 
 using HDF5: exists
 
+using Op
 
-out_dir = joinpath(dirname(@__FILE__), "..", "out")
-data_dir = joinpath(dirname(@__FILE__), "..", "data")
-data_jld = joinpath(data_dir, "data.jld")
-plot_size = (4000, 800)
 
 """
 :param key:
@@ -287,7 +284,7 @@ Get TXO with simple filter
 function get_txo()
     df = load(data_jld, "txo")
 
-    df[df[:T] .> 3, :]
+    df = df[df[:T] .> 3, :]
     df[:BS_err] = df[:BS] .- df[:Close]
 
     df

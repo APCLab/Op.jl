@@ -261,6 +261,7 @@ function train_test()
 
         fit = mx.predict(model, plotprovider)
 
+        info("ploting prediction result")
         plot_pred(target_test, fit, net, iname, lname, mname)
 
         result = DataFrame(
@@ -271,7 +272,7 @@ function train_test()
     end
 end
 
-function run()
+function run_all()
     for i ∈ [:orig, :ta, :bs, :bs_err]
         input(i)
 

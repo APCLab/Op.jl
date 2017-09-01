@@ -2,15 +2,8 @@ using MXNet
 using Distributions
 using Plots
 
-import TimeSeries: TimeArray
-
-include("./preproc.jl")
-
 pyplot()
 
-out_dir = joinpath(dirname(@__FILE__), "..", "out")
-plot_size = (1200, 800)
-plot_rng = 1000  # ploting range for x and y axis
 
 """
 Mean Normalization
@@ -278,13 +271,16 @@ function train_test()
     end
 end
 
-for i ∈ [:orig, :ta, :bs, :bs_err]
-    input(i)
+function run()
+    for i ∈ [:orig, :ta, :bs, :bs_err]
+        input(i)
 
-    global trainprovider
-    global evalprovider
-    global plotprovider
-    trainprovider, evalprovider, plotprovider = get_provider()
+        global trainprovider
+        global evalprovider
+        global plotprovider
+        trainprovider, evalprovider, plotprovider = get_provider()
 
-    train_test()
+        train_test()
+    end
+    nothing
 end
